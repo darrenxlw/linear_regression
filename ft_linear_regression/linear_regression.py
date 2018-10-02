@@ -27,7 +27,7 @@ class LinearRegression:
     def estimate_price(self, mileage):
         return self.theta0 + self.theta1 * mileage
 
-    def train_model(self, path, learningRate, reset_theta=True, plot=True):
+    def train_model(self, path, learningRate, reset_theta=True, plot=False):
         def reconstruct_regressor():
             return ((self.theta0 - self.theta1 * np.mean(self.data['km']) / np.std(self.data['km'])) * np.std(self.data['price']) + np.mean(self.data['price']),
                     self.theta1 / np.std(self.data['km']) * np.std(self.data['price']))
@@ -55,12 +55,11 @@ class LinearRegression:
             if plot and (i%10 == 0):
                 y_vals = reconstruct_regressor()[0] + reconstruct_regressor()[1] * x_vals
                 plt.plot(x_vals, y_vals, '--')
-                time.sleep(0.5)
 
             if (abs(tmp_theta0) < self.precision) and (abs(tmp_theta1) < self.precision):
                 print('epochs:' + str(i))
                 break
-        if plot: plt.show()
+        #if plot: plt.show()
         self.theta0 = reconstruct_regressor()[0]
         self.theta1 = reconstruct_regressor()[1]
 
