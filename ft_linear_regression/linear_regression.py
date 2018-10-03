@@ -30,8 +30,8 @@ class LinearRegression:
             return ((self.theta0_norm - self.theta1_norm * np.mean(self.data[:,0]) / np.std(self.data[:,0])) * np.std(self.data[:,1]) + np.mean(self.data[:,1]),
                     self.theta1_norm / np.std(self.data[:,0]) * np.std(self.data[:,1]))
 
+        self.log = []
         if reset_theta:
-            self.log = []
             self.theta0_norm = 0
             self.theta1_norm = 0
 
@@ -100,12 +100,17 @@ class LinearRegression:
         ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
         fig.colorbar(surf, shrink=0.8)
 
-        #log0 = [i[0] for i in self.log]
-        #log1 = [i[1] for i in self.log]
-        #z2 = np.zeros(len(self.log))
-        #for i in range(len(z2)):
-        #    z2[i] = er_flat(log0[i], log1[i])
-        #ax.plot(log0, log1, z2, linestyle='--', marker='3', color='c', markersize=0.1)
+
+        log0 = [i[0] for i in self.log]
+        log1 = [i[1] for i in self.log]
+
+        z2 = np.zeros(len(self.log))
+        for i in range(len(z2)):
+            z2[i] = er_flat(log0[i], log1[i],self.data)
+        ax.plot(log0, log1, z2, linestyle='-', marker='o', color='c', markersize=4)
+
+        print("Z2")
+        print(z2)
 
         plt.show()
 
