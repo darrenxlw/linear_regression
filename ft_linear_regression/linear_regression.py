@@ -1,7 +1,6 @@
 import os
 
 import numpy as np
-import time
 from matplotlib import pyplot as plt
 
 class LinearRegression:
@@ -14,41 +13,45 @@ class LinearRegression:
         self.data = {}
 
     def read_csv(self, path):
-        km=[]
-        price=[]
-        with open(path, 'r') as f:
-            for idx, line in enumerate(f):
-                if idx > 0:
-                    vals=line.rstrip('\n').split(',')
-                    km.append(int(vals[0]))
-                    price.append(int(vals[1]))
-        return {"km": km, "price": price, "km_norm": [(i-np.mean(km))/np.std(km) for i in km], "price_norm": [(i-np.mean(price))/np.std(price) for i in price]}
+        #km=[]
+        #price=[]
+        #with open(path, 'r') as f:
+        #    for idx, line in enumerate(f):
+        #        if idx > 0:
+        #            vals=line.rstrip('\n').split(',')
+        #            km.append(int(vals[0]))
+        #            price.append(int(vals[1]))
+        return np.genfromtxt(path, delimiter=',', skip_header=1)
+        #return {"km": km, "price": price, "km_norm": [(i-np.mean(km))/np.std(km) for i in km], "price_norm": [(i-np.mean(price))/np.std(price) for i in price]}
 
     def estimate_price(self, mileage):
         return self.theta0 + self.theta1 * mileage
 
     def train_model(self, path, learningRate, reset_theta=True, plot=False):
         def reconstruct_regressor():
-            return ((self.theta0 - self.theta1 * np.mean(self.data['km']) / np.std(self.data['km'])) * np.std(self.data['price']) + np.mean(self.data['price']),
-                    self.theta1 / np.std(self.data['km']) * np.std(self.data['price']))
+            return ((self.theta0 - self.theta1 * np.mean(self.data[:,0]) / np.std(self.data[:,0])) * np.std(self.data[:,1]) + np.mean(self.data[:,1]),
+                    self.theta1 / np.std(self.data[:,0]) * np.std(self.data[:,1]))
 
         if reset_theta:
             self.theta0 = 0
             self.theta1 = 0
+
         self.data = self.read_csv(path)
-        m = len(self.data['price_norm'])
+        m = len(self.data)
+
+        print(self.data)
 
         if plot:
-            plt.plot(self.data['km'], self.data['price'], 'ro')
+            plt.plot(self.data[:,0], self.data[:,1], 'ro')
             axes = plt.gca()
             x_vals = np.array(axes.get_xlim())
 
-        for i in range(self.max_epochs):
-            tmp_theta0 = learningRate * sum(
-                [self.estimate_price(self.data['km_norm'][i]) - self.data['price_norm'][i] for i in range(m)]) / m
-            tmp_theta1 = learningRate * sum(
-                [(self.estimate_price(self.data['km_norm'][i]) - self.data['price_norm'][i]) * self.data['km_norm'][i] for i in range(m)]) / m
+        km_norm = (self.data[:,0]-np.mean(self.data[:,0])) / np.std(self.data[:,0])
+        price_norm = (self.data[:,1]-np.mean(self.data[:,1])) / np.std(self.data[:,1])
 
+        for i in range(self.max_epochs):
+            tmp_theta0 = learningRate * sum(self.estimate_price(km_norm) - price_norm) / m
+            tmp_theta1 = learningRate * sum((self.estimate_price(km_norm) - price_norm) * km_norm) / m
             self.theta0 -= tmp_theta0
             self.theta1 -= tmp_theta1
 
@@ -59,17 +62,16 @@ class LinearRegression:
             if (abs(tmp_theta0) < self.precision) and (abs(tmp_theta1) < self.precision):
                 print('epochs:' + str(i))
                 break
-        #if plot: plt.show()
+        if plot: plt.show()
         self.theta0 = reconstruct_regressor()[0]
         self.theta1 = reconstruct_regressor()[1]
 
     def visualize(self):
-        plt.plot(self.data['km'], self.data['price'], 'ro')
+        plt.plot(self.data[:,0], self.data[:,1], 'ro')
         axes = plt.gca()
         x_vals = np.array(axes.get_xlim())
         y_vals = self.theta0 + self.theta1 * x_vals
         plt.plot(x_vals, y_vals, '--')
         plt.show()
-
 
 
