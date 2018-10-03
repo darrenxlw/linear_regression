@@ -5,8 +5,11 @@ import time
 from matplotlib import pyplot as plt
 
 class LinearRegression:
-    max_epochs = 10000
-    precision= 0.00001
+
+    """
+    LinearRegression is defined as class with severl properties useful for data reading & scaling,
+    fitting the parameters
+    """
 
     def __init__(self):
         self.theta0 = 0
@@ -27,7 +30,7 @@ class LinearRegression:
     def estimate_price(self, mileage):
         return self.theta0 + self.theta1 * mileage
 
-    def train_model(self, path, learningRate, reset_theta=True, plot=False):
+    def train_model(self, path, learningRate, max_epochs=10000, precision=0.00001, reset_theta=True, plot=False):
         def reconstruct_regressor():
             return ((self.theta0 - self.theta1 * np.mean(self.data['km']) / np.std(self.data['km'])) * np.std(self.data['price']) + np.mean(self.data['price']),
                     self.theta1 / np.std(self.data['km']) * np.std(self.data['price']))
@@ -43,7 +46,7 @@ class LinearRegression:
             axes = plt.gca()
             x_vals = np.array(axes.get_xlim())
 
-        for i in range(self.max_epochs):
+        for i in range(max_epochs):
             tmp_theta0 = learningRate * sum(
                 [self.estimate_price(self.data['km_norm'][i]) - self.data['price_norm'][i] for i in range(m)]) / m
             tmp_theta1 = learningRate * sum(
@@ -56,7 +59,7 @@ class LinearRegression:
                 y_vals = reconstruct_regressor()[0] + reconstruct_regressor()[1] * x_vals
                 plt.plot(x_vals, y_vals, '--')
 
-            if (abs(tmp_theta0) < self.precision) and (abs(tmp_theta1) < self.precision):
+            if (abs(tmp_theta0) < precision) and (abs(tmp_theta1) < precision):
                 print('epochs:' + str(i))
                 break
         #if plot: plt.show()
