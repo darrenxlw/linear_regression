@@ -59,8 +59,9 @@ class LinearRegression:
                     self.theta1_norm / np.std(self.data[:,0]) * np.std(self.data[:,1]))
 
 
+        self.log = []
+
         if reset_theta:
-            self.log = []
             self.theta0_norm = 0
             self.theta1_norm = 0
 
@@ -134,12 +135,17 @@ class LinearRegression:
         ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
         fig.colorbar(surf, shrink=0.8)
 
-        #log0 = [i[0] for i in self.log]
-        #log1 = [i[1] for i in self.log]
-        #z2 = np.zeros(len(self.log))
-        #for i in range(len(z2)):
-        #    z2[i] = er_flat(log0[i], log1[i])
-        #ax.plot(log0, log1, z2, linestyle='--', marker='3', color='c', markersize=0.1)
+
+        log0 = [i[0] for i in self.log]
+        log1 = [i[1] for i in self.log]
+
+        z2 = np.zeros(len(self.log))
+        for i in range(len(z2)):
+            z2[i] = er_flat(log0[i], log1[i],self.data)
+        ax.plot(log0, log1, z2, linestyle='-', marker='o', color='c', markersize=4)
+
+        print("Z2")
+        print(z2)
 
 
         plt.show()
@@ -147,39 +153,3 @@ class LinearRegression:
 
 
 
-
-
-#tmp=LinearRegression()
-#tmp.train_model('data/data.csv',0.01)
-#tmp.visualize()
-#
-#x=tmp.data
-#def er_flat(theta0_tmp, theta1_tmp):
-#    m = len(tmp.data)
-#    km_norm = (tmp.data[:, 0] - np.mean(tmp.data[:, 0])) / np.std(tmp.data[:, 0])
-#    price_norm = (tmp.data[:, 1] - np.mean(tmp.data[:, 1])) / np.std(tmp.data[:, 1])
-#    return 1/(2*m) * sum((estimate_price(km_norm,theta0_tmp, theta1_tmp) - price_norm)**2)
-#
-#theta0_tmp = np.arange(-1,1,0.01)
-#theta1_tmp = np.arange(-1,1,0.01)
-#x,y=np.meshgrid(theta0_tmp,theta1_tmp)
-#
-#z=np.zeros(shape=x.shape)
-#for i in range(z.shape[0]):
-#    for j in range(z.shape[1]):[i,j] = er_flat(x[i,j],y[i,j])
-#
-#
-#fig = plt.figure()
-#ax = fig.gca(projection='3d')
-#surf = ax.plot_surface(x, y, z, cmap=cm.inferno,
-#                       linewidth=0, antialiased=False)
-#
-##ax.set_zlim(0, 3.01)
-#ax.zaxis.set_major_locator(LinearLocator(10))
-#ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-#
-## Add a color bar which maps values to colors.
-#fig.colorbar(surf, aspect=5)
-#
-#plt.show()
-#
