@@ -89,13 +89,20 @@ class LinearRegression:
             axes = plt.gca()
             x_vals = np.array(axes.get_xlim())
 
+        """
+        Here we simply normalize the data before doing the fitting.
+        """
         km_norm = (self.data[:, 0]-np.mean(self.data[:, 0])) / np.std(self.data[:, 0])
         price_norm = (self.data[:, 1]-np.mean(self.data[:, 1])) / np.std(self.data[:, 1])
 
         for i in range(max_epochs):
-            tmp_theta0 = learning_rate * sum(self.estimate_price(self.theta0_norm,self.theta1_norm,km_norm)
+            """
+            This part corresponds to the Gradient Descent. At each step of the "for loop" theta0 and theta1 are updated
+            by taking the previous values to which we substract a value on the opposite gradient direction.
+            """
+            tmp_theta0 = learning_rate * sum(self.estimate_price(self.theta0_norm, self.theta1_norm, km_norm)
                                              - price_norm) / m
-            tmp_theta1 = learning_rate * sum((self.estimate_price(self.theta0_norm,self.theta1_norm,km_norm)
+            tmp_theta1 = learning_rate * sum((self.estimate_price(self.theta0_norm, self.theta1_norm, km_norm)
                                               - price_norm) * km_norm) / m
 
             self.theta0_norm -= tmp_theta0
@@ -104,6 +111,10 @@ class LinearRegression:
             self.log.append((self.theta0_norm,self.theta1_norm))
 
             if plot and (i % 10 == 0):
+                """
+                This part enables to visualize the training process. It will plot a line at every 10th step of the
+                gradient descent with the temporary couple tmp_theta0, tmp_theta1.
+                """
                 y_vals = reconstruct_regressor()[0] + reconstruct_regressor()[1] * x_vals
                 plt.plot(x_vals, y_vals, '--')
 
@@ -117,8 +128,10 @@ class LinearRegression:
 
     def visualize(self):
         """
-        This function enables to visualize the training process. It plots the surface of the loss function (with
-        normalized values) and display the trajectory of the gradient descent on that surface to reach a minimum.
+        This function enables to visualize the final result.
+
+        It also plots the surface of the loss function (with normalized values) and display the trajectory of the
+        gradient descent on that surface to reach a minimum.
         Since here the dataset is small and X is 1D, it does not take long to compute any of those.
 
         In a more complicated set: eg X is 2D or more, and the dataset is large, it becomes impossible to plot
